@@ -70,11 +70,13 @@ def login():
         return jsonify({"error": "Invalid email or password"}), 401
 
     # Create JWT token
-    access_token = create_access_token(identity={
-        "id": user["id"],
-        "email": user["email"],
-        "role": user["role"]
-    })
+    access_token = create_access_token(
+        identity=str(user["id"]),  # required: string
+        additional_claims={
+            "email": user["email"],
+            "role": user["role"]
+        }
+    )
 
     return jsonify({
         "access_token": access_token,
@@ -84,6 +86,12 @@ def login():
             "role": user["role"]
         }
     }), 200
+
+# ------------------ LOGOUT ------------------
+
+@app.route('/auth/logout', methods=['DELETE'])
+def logout():
+    return "JWT token cleared", 200
 
 # ------------------ MAIN ------------------
 
