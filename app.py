@@ -23,18 +23,20 @@ def health_check():
 @app.route('/auth/register', methods=['POST'])
 def register():
     data = request.json
+    name = data.get("name")
     email = data.get("email")
     password = data.get("password")
     role = data.get("role", "customer")  # default to customer
 
-    if not email or not password:
-        return jsonify({"error": "Email and password required"}), 400
+    if not name or not email or not password:
+        return jsonify({"error": "Name, email and password are required"}), 400
 
     # Hash the password using bcrypt
     hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
     # Forward the request to db-service to create the user
     response = requests.post(f"{DB_SERVICE_URL}/users", json={
+        "name": name,
         "email": email,
         "password": hashed_pw,
         "role": role
@@ -73,6 +75,7 @@ def login():
     access_token = create_access_token(
         identity=str(user["id"]),  # required: string
         additional_claims={
+            "name": user["name"],
             "email": user["email"],
             "role": user["role"]
         }
@@ -82,6 +85,7 @@ def login():
         "access_token": access_token,
         "user": {
             "id": user["id"],
+            "name": user["name"],
             "email": user["email"],
             "role": user["role"]
         }
