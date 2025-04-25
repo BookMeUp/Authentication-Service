@@ -1,9 +1,12 @@
 from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, create_access_token
+from prometheus_flask_exporter import PrometheusMetrics
 import requests
 import bcrypt
 
 app = Flask(__name__)
+
+metrics = PrometheusMetrics(app)
 
 # Secret key for JWT
 app.config['JWT_SECRET_KEY'] = 'super-secret-key'  # change in production
@@ -100,4 +103,4 @@ def logout():
 # ------------------ MAIN ------------------
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=False)
